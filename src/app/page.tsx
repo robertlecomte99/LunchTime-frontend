@@ -56,6 +56,7 @@ export default function Home() {
             alt="Logo Resto" 
             width={150}          // Largeur en pixels
             height={150}         // Hauteur en pixels
+            loading="eager"
             className="object-contain"
           />
 

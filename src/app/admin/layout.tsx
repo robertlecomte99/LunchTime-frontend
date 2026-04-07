@@ -1,6 +1,14 @@
+"use client";
+
 import Link from "next/link";
+import Cookies from 'js-cookie';
+
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const logout = () => {
+    Cookies.remove('token'); // On supprime le cookie
+    window.location.href = "/login"; // Redirection brutale mais efficace
+  };
   return (
     <div className="flex min-h-screen bg-slate-50 font-sans">
       {/* SIDEBAR FIXE */}
@@ -18,7 +26,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             🔔 Suivi des commandes en cours
           </Link>
         </nav>
-
+        <button 
+          onClick={logout} 
+          className="mt-4 p-3 text-left text-red-400 hover:bg-slate-800 rounded-lg transition font-medium"
+        >
+          🚪 Déconnexion
+        </button>
         <div className="pt-6 border-t border-slate-700">
           <Link href="/" className="text-sm text-slate-400 hover:text-white underline">Voir le site client</Link>
         </div>

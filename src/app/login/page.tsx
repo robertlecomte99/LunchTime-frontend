@@ -1,7 +1,9 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import React, { FormEvent } from 'react';
+import Cookies from 'js-cookie';
+
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -18,8 +20,9 @@ export default function LoginPage() {
 
     if (res.ok) {
       const data = await res.json();
-      localStorage.setItem("token", data.token); // On stocke le jeton
-      router.push("/admin"); // Direction le dashboard
+      Cookies.set('token', data.token, { expires: 1 }); 
+      //localStorage.setItem("token", data.token); // On stocke le jeton
+      router.push("/admin"); // Direction le dashboard admin
     } else {
       alert("Erreur de connexion");
     }
