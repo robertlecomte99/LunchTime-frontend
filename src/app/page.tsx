@@ -2,7 +2,7 @@
 
 import Image from "next/image"; // Importation du composant Image
 import Link from "next/link";
-
+import { toast } from 'sonner';
 import { useEffect, useState } from "react";
 
 // Définition du type pour un plat
@@ -38,7 +38,9 @@ export default function Home() {
     });
 
     if (res.ok) {
-      alert("Commande enregistrée !");
+      toast.success("Commande enregistrée!");
+    } else {
+      toast.error("Echec de l'enregistrement de la commande.");
     }
   };
 

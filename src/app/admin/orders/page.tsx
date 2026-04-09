@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { apiFetch } from "@/lib/api";
+//import { Toaster } from 'sonner';
 
 interface Dish {
   id: number;
@@ -31,7 +33,7 @@ export default function AdminPage() {
 
   // 2. Fonction pour charger les commandes
   const fetchOrders = async () => {
-    const res = await fetch("http://resto-api.test/api/orders");
+    const res = await apiFetch("/orders");
     const data = await res.json();
     setOrders(data);
   };
@@ -45,11 +47,11 @@ export default function AdminPage() {
 
   // 4. Fonction pour changer le statut au clic
   const handleStatusChange = async (orderId: number, nextStatus: string) => {
-    await fetch(`http://resto-api.test/api/orders/${orderId}`, {
+    await apiFetch(`/orders/${orderId}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: nextStatus }),
     });
+
     fetchOrders(); // Rafraîchissement immédiat
   };
 
@@ -61,7 +63,6 @@ export default function AdminPage() {
           <h1 className="text-3xl font-bold text-slate-800">Suivi des commandes</h1>
           <Link href="/" className="text-blue-600 hover:underline">← Retour au Menu</Link>
         </div>
-
         
         {/* --- suivi du statut de la commande --- */}
         <div className="mb-12">

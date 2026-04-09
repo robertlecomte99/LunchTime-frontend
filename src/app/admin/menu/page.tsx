@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { apiFetch } from "@/lib/api";
+
 import { useRouter } from "next/navigation";
+import { toast } from 'sonner';
 
 
 interface Dish {
@@ -20,6 +23,7 @@ export default function AdminPage() {
 
   const [editingId, setEditingId] = useState<number | null>(null);
   const [sortConfig, setSortConfig] = useState({ key: 'orders_count', direction: 'desc' });
+  const [errors, setErrors] = useState({});
 
   //  Charger les données (Plats)
   const fetchData = async () => {
@@ -43,16 +47,17 @@ export default function AdminPage() {
   // Ajouter ou modifier un plat
  const handleSubmit = async (e: React.SubmitEvent) => {
   e.preventDefault();
-  // 1. Récupérer le token
-  const token = localStorage.getItem("token");
+  
+  //const token = localStorage.getItem("token"); ancienne methode de recup token
+  const url = editingId 
+    ? `/dishes/${editingId}` 
+    : "/dishes";
+  const method = editingId ? "PUT" : "POST";
+  const message = editingId ? "Plat mis à jour avec succés" : "Plat ajouté avec succés";
 
-  // 2. L'envoyer dans les headers
-  const res = await fetch("http://resto-api.test/api/dishes", {
-    method: "POST",
-    headers: { 
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
+  const res=await apiFetch(url, {
+    method: method,
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(form),
   });
 
@@ -61,18 +66,16 @@ export default function AdminPage() {
     router.push("/login");
     return;
   }
-
-  const url = editingId 
-    ? `http://resto-api.test/api/dishes/${editingId}` 
-    : "http://resto-api.test/api/dishes";
+  if (res.status === 422) {
+    const data = await res.json();
+    setErrors(data.errors); // Laravel renvoie les erreurs par champ
+  }  
     
-  const method = editingId ? "PUT" : "POST";
-
-  await fetch(url, {
-    method: method,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(form),
-  });
+  if (res.ok) {
+    toast.success(message);
+  } else {
+    toast.error("Échec de la requête.");
+  }
 
   // Reset
   setEditingId(null);
@@ -83,8 +86,15 @@ export default function AdminPage() {
   //  Supprimer un plat
   const handleDelete = async (id: number) => {
     if (confirm("Supprimer ce plat ?")) {
-      await fetch(`http://resto-api.test/api/dishes/${id}`, { method: "DELETE" });
-      fetchData();
+      //await fetch(`http://resto-api.test/api/dishes/${id}`, { method: "DELETE" });
+      //fetchData();
+      const res = await apiFetch(`/dishes/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast.success("Le plat a été supprimé !");
+        fetchData();
+      } else {
+        toast.error("Erreur lors de la suppression.");
+      }
     }
   };
 
@@ -147,6 +157,7 @@ export default function AdminPage() {
               />
               <input 
                 type="number" 
+                min="0"
                 step="500" 
                 placeholder="Prix" 
                 className="w-full p-2 border rounded bg-white text-slate-900 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 outline-none" 

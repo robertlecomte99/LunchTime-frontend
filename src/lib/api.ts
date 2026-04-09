@@ -2,17 +2,12 @@ import Cookies from 'js-cookie';
 
 export const apiFetch = async (url: string, options: RequestInit = {}) => {
   // On récupère le token dans le cookie 'token'
-  const token = Cookies.get('token');
+ const token = typeof window !== "undefined" ? Cookies.get('token') : null;
 
-  const defaultHeaders: Record<string, string> = {
+  const defaultHeaders = {
     "Content-Type": "application/json",
-    "Accept": "application/json",
+    ...(token ? { "Authorization": `Bearer ${token}` } : {}),
   };
-
-  // Si le token existe, on l'ajoute aux headers
-  if (token) {
-    defaultHeaders["Authorization"] = `Bearer ${token}`;
-  }
 
   const response = await fetch(`http://resto-api.test/api${url}`, {
     ...options,

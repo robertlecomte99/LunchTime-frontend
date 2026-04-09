@@ -2,7 +2,8 @@
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 import { useEffect, useState } from "react";
-import Link from "next/link";
+//import Link from "next/link";
+//import { toast } from 'sonner';
 
 interface Dish {
   id: number;
