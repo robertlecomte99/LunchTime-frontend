@@ -16,6 +16,7 @@ interface Dish {
 export default function AdminPage() {
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [form, setForm] = useState({ name: "", description: "", price: "" });
+  const [isLoading, setIsLoading] = useState(false);
 
   //  Charger les données (Plats)
   const fetchData = async () => {
@@ -61,10 +62,33 @@ export default function AdminPage() {
       <div className="max-w-5xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-slate-800">Suivi des commandes</h1>
-          <Link href="/" className="text-blue-600 hover:underline">← Retour au Menu</Link>
         </div>
         
-        {/* --- suivi du statut de la commande --- */}
+        {isLoading ? (
+          <p>Chargement des commandes...</p>
+        ) : orders.filter(o => o.status !== 'delivered').length === 0 ? (
+          /* --- DÉBUT DE L'ÉTAT VIDE --- */
+          <div className="flex flex-col items-center justify-center bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg p-12 text-center">
+            <div className="bg-orange-100 p-4 rounded-full mb-4">
+              {/* Une petite icône de cloche ou de ticket */}
+              <svg className="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900">Aucune commande en cours</h3>
+            <p className="text-gray-500 mt-1">Dès qu'un client passera commande, elle apparaîtra ici.</p>
+            {/*<button 
+              onClick={fetchOrders}
+              className="mt-4 text-sm font-semibold text-orange-600 hover:text-orange-500"
+            >
+              Vérifier les nouvelles commandes ↻
+            </button>*/}
+          </div>
+          
+          /* --- FIN DE L'ÉTAT VIDE --- */
+        ) : (
+
+        /* --- suivi du statut de la commande --- */
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
             🔔 Commandes en cours
@@ -100,10 +124,11 @@ export default function AdminPage() {
               </div>
             ))}
           </div>
+
         </div>
 
         
-      </div>
+      )}</div>
     </div>
   );
 }

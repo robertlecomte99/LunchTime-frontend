@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+//import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 
 import { useRouter } from "next/navigation";
@@ -130,7 +130,6 @@ export default function AdminPage() {
       <div className="max-w-5xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-slate-800">Gestion des plats à la carte</h1>
-          <Link href="/" className="text-blue-600 hover:underline">← Retour au Menu</Link>
         </div>
                 
 
