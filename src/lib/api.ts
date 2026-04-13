@@ -5,8 +5,9 @@ export const apiFetch = async (url: string, options: RequestInit = {}) => {
  const token = typeof window !== "undefined" ? Cookies.get('token') : null;
 
   const defaultHeaders = {
-    "Content-Type": "application/json",
+    //"Content-Type": "application/json",
     ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    
   };
 
   const response = await fetch(`http://resto-api.test/api${url}`, {
@@ -27,3 +28,4 @@ export const apiFetch = async (url: string, options: RequestInit = {}) => {
 
   return response;
 };
+

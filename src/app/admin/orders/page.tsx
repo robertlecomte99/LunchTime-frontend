@@ -82,7 +82,7 @@ export default function AdminPage() {
               className="mt-4 text-sm font-semibold text-orange-600 hover:text-orange-500"
             >
               Vérifier les nouvelles commandes ↻
-            </button>*/}
+            </button>*/} 
           </div>
           
           /* --- FIN DE L'ÉTAT VIDE --- */

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 //import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 
@@ -13,17 +13,27 @@ interface Dish {
   name: string;
   description: string;
   price: string;
+  image: string;
   orders_count: number;
 }
 
 export default function AdminPage() {
   const [dishes, setDishes] = useState<Dish[]>([]);
-  const [form, setForm] = useState({ name: "", description: "", price: "" });
+  //const [form, setForm] = useState({ name: "", description: "", price: "", image:""});
   const router = useRouter();
 
   const [editingId, setEditingId] = useState<number | null>(null);
   const [sortConfig, setSortConfig] = useState({ key: 'orders_count', direction: 'desc' });
   const [errors, setErrors] = useState({});
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [file, setFile] = useState<File | null>(null);
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [image, setImage] = useState("");
+  const [description, setDescription] = useState("");
+  
 
   //  Charger les données (Plats)
   const fetchData = async () => {
@@ -37,28 +47,46 @@ export default function AdminPage() {
   // 
   const startEdit = (dish: Dish) => {
     setEditingId(dish.id);
-    setForm({
-      name: dish.name,
-      description: dish.description || "",
-      price: dish.price
-    });
+    //setForm({name: dish.name,description: dish.description || "",price: dish.price,image: dish.image});
+    setName(dish.name);
+    setDescription(dish.description || "");
+    setPrice(dish.price);
+    setImage(dish.image);
   };
 
+  const handleResetFile = () => {
+    setFile(null); 
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // On vide l'input physiquement
+    }
+  };
   // Ajouter ou modifier un plat
- const handleSubmit = async (e: React.SubmitEvent) => {
+ const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
   e.preventDefault();
   
   //const token = localStorage.getItem("token"); ancienne methode de recup token
   const url = editingId 
     ? `/dishes/${editingId}` 
     : "/dishes";
-  const method = editingId ? "PUT" : "POST";
+  //const method = editingId ? "PUT" : "POST";
   const message = editingId ? "Plat mis à jour avec succés" : "Plat ajouté avec succés";
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('description', description);
+  formData.append('price', price.toString());
+  
+  if (file) {
+      formData.append('image', file); //fichier binaire
+  }
+
+  if (editingId) {
+      formData.append('_method', 'PUT');
+  }
 
   const res=await apiFetch(url, {
-    method: method,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(form),
+    method: "POST",
+    //headers: { "Content-Type": "Application/JSON"},
+    body: formData,
   });
 
   if (res.status === 401) {
@@ -78,9 +106,15 @@ export default function AdminPage() {
   }
 
   // Reset
+  handleResetFile();
   setEditingId(null);
-  setForm({ name: "", description: "", price: "" });
+  //setForm({ name: "", description: "", price: "",image: ""});
+  setName("");
+  setDescription("");
+  setPrice("");
   fetchData();
+  setImage("");
+  
 };
 
   //  Supprimer un plat
@@ -144,15 +178,15 @@ export default function AdminPage() {
                 type="text" 
                 placeholder="Nom du plat" 
                 className="w-full p-2 border rounded bg-white text-slate-900 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 outline-none" 
-                value={form.name} 
-                onChange={e => setForm({...form, name: e.target.value})} 
+                value={name}
+                onChange={e => setName(e.target.value)} 
                 required 
               />
               <textarea 
                 placeholder="Description" 
                 className="w-full p-2 border rounded bg-white text-slate-900 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 outline-none" 
-                value={form.description} 
-                onChange={e => setForm({...form, description: e.target.value})} 
+                value={description} 
+                onChange={e => setDescription(e.target.value)} 
               />
               <input 
                 type="number" 
@@ -160,10 +194,58 @@ export default function AdminPage() {
                 step="500" 
                 placeholder="Prix" 
                 className="w-full p-2 border rounded bg-white text-slate-900 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 outline-none" 
-                value={form.price} 
-                onChange={e => setForm({...form, price: e.target.value})} 
+                value={price} 
+                onChange={e => setPrice(e.target.value)} 
                 required 
               />
+              
+              <div className="flex flex-col gap-2 text-gray-400">
+                
+                  <input 
+                    type="file" 
+                    ref={fileInputRef}
+                    id="image"
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files) {
+                        setFile(e.target.files[0]); //stockage du fichier dans un state
+                      }
+                    }}
+                    className="border p-2 rounded"
+                  />
+                  {file && (
+                    <button
+                      type="button"
+                      onClick={handleResetFile}
+                      className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-700 transition-colors"
+                      title="Supprimer le fichier"
+                    >
+                      ✕
+                    </button>
+                  )}
+                
+                {file ? (
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500">Aperçu :</p>
+                    <img 
+                      src={URL.createObjectURL(file)} 
+                      alt="Aperçu" 
+                      className="w-20 h-20 object-cover rounded border"
+                    />
+                  </div>
+                ):(
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500">Aperçu :</p>
+                    <img 
+                      src={`http://resto-api.test/storage/${image}`} 
+                      alt="Aperçu" 
+                      className="w-20 h-20 object-cover rounded border"
+                    />
+                  </div>
+                )}
+
+              </div>
+
               <div className="flex gap-2">
                 <button className="flex-1 bg-slate-800 text-white py-2 rounded font-bold hover:bg-slate-900 transition">
                   {editingId ? "Mettre à jour" : "Enregistrer"}
@@ -171,7 +253,7 @@ export default function AdminPage() {
                 {editingId && (
                   <button 
                     type="button" 
-                    onClick={() => { setEditingId(null); setForm({name:"", description:"", price:""}); }}
+                    onClick={() => { setEditingId(null); setName("");setDescription("");setPrice("");setImage(""); handleResetFile}}
                     className="bg-gray-200 text-gray-700 px-4 py-2 rounded font-bold"
                   >
                     Annuler

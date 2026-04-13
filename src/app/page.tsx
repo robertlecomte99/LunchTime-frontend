@@ -11,6 +11,7 @@ interface Dish {
   name: string;
   description: string;
   price: string;
+  image: string | null;
   orders_count: number;
 }
 
@@ -80,6 +81,21 @@ export default function Home() {
                 <span>{dish.orders_count} COMMANDE(S)</span>
               </div>
             )}
+
+            {/* Affichage de l'image */}
+            <div className="relative h-48 w-full bg-gray-100">
+              {dish.image ? (
+                <img 
+                  className="object-cover w-full h-full"
+                  src={`http://resto-api.test/storage/${dish.image}`}     // Chemin relatif au dossier public
+                  alt={dish.name} 
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-400">
+                  Pas de photo
+                </div>
+              )}
+            </div>
 
             <h2 className="text-xl font-semibold text-gray-700">{dish.name}</h2>
             <p className="text-gray-500 my-2">{dish.description}</p>
