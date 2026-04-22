@@ -24,8 +24,15 @@ export default function LoginPage() {
       if (res.ok) {
         const data = await res.json();
         Cookies.set('token', data.token, { expires: 1 }); 
+        Cookies.set('role', data.user.role, { expires: 7 });
+        Cookies.set('userName', data.user.name)
         //localStorage.setItem("token", data.token); // On stocke le jeton
-        router.push("/admin"); // Direction le dashboard admin
+        
+        if (data.user.role !== "admin") {
+          router.push("/admin"); 
+        }else {
+          router.push("/"); 
+        }
       } else {
         toast.error("Erreur de connexion.");
       }

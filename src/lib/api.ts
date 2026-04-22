@@ -6,6 +6,7 @@ export const apiFetch = async (url: string, options: RequestInit = {}) => {
 
   const defaultHeaders = {
     //"Content-Type": "application/json",
+    'Accept': 'application/json',
     ...(token ? { "Authorization": `Bearer ${token}` } : {}),
     
   };

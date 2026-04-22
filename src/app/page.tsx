@@ -1,11 +1,12 @@
-"use client"; // Obligatoire pour utiliser useEffect et useState
+"use client";
 
-import Image from "next/image"; // Importation du composant Image
+import Image from "next/image";
 import Link from "next/link";
 import { toast } from 'sonner';
 import { useEffect, useState } from "react";
+import Cookies from 'js-cookie';
+import { apiFetch } from "@/lib/api";
 
-// Définition du type pour un plat
 interface Dish {
   id: number;
   name: string;
@@ -18,10 +19,10 @@ interface Dish {
 export default function Home() {
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [loading, setLoading] = useState(true);
+  const userName = Cookies.get('userName');
 
-  // 1. Récupérer les plats au chargement
   useEffect(() => {
-    fetch("http://resto-api.test/api/dishes")
+    apiFetch("/dishes")
       .then((res) => res.json())
       .then((data) => {
         setDishes(data);
@@ -30,7 +31,6 @@ export default function Home() {
       .catch(err => console.error("Erreur API:", err));
   }, []);
 
-  // 2. Fonction pour commander
   const handleOrder = async (dishId: number) => {
     const res = await fetch("http://resto-api.test/api/orders", {
       method: "POST",
@@ -39,78 +39,154 @@ export default function Home() {
     });
 
     if (res.ok) {
-      toast.success("Commande enregistrée!");
+      toast.success("Commande enregistrée");
     } else {
-      toast.error("Echec de l'enregistrement de la commande.");
+      toast.error("Échec de la commande");
     }
   };
 
-  if (loading) return <p className="p-10 text-center">Chargement du menu...</p>;
+  const logout = () => {
+    Cookies.remove('token'); 
+    window.location.href = "/login"; 
+  };
+
+  if (loading) return (
+    <div className="flex h-screen items-center justify-center bg-stone-50">
+      <div className="animate-pulse text-stone-400 text-sm tracking-widest uppercase font-medium">Chargement...</div>
+    </div>
+  );
+
+  const platDuJour = dishes[0];
+  const otherDishes = dishes.slice(1);
 
   return (
-    <main className="min-h-screen bg-[#FFF7ED] p-8 font-sans text-slate-900">
-      <div>
-        <Link href="/admin" className="text-blue-600 hover:underline">← page Admin</Link>
-      </div>
-      <div className="flex flex-col items-center mb-12">
-        <div className="bg-white p-4 rounded-full shadow-sm mb-4">
-          <Image 
-            src="/logo.jpg"     // Chemin relatif au dossier public
-            alt="Logo Resto" 
-            width={150}          // Largeur en pixels
-            height={150}         // Hauteur en pixels
-            loading="eager"
-            className="object-contain"
-          />
-
-        </div>
-        {/*<h1 className="text-4xl font-extrabold text-slate-800 tracking-tight">
-          Un Instant...
-        </h1>*/}
-        <p className="text-slate-500 mt-2 italic">Restaurant - Pâtisserie - Salon de thé</p>
-    </div>
-      <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">🍽️ Menu du jour</h1>
+    <main className="min-h-screen bg-stone-50 font-sans text-stone-900 antialiased pb-12">
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {dishes.map((dish) => (
-          <div key={dish.id} className="relative bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            
-            {dish.orders_count > 0 && (
-              <div className="absolute top-0 right-0 bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-1 rounded-bl-lg flex items-center gap-1">
-                <span>🔥</span>
-                <span>{dish.orders_count} COMMANDE(S)</span>
-              </div>
-            )}
-
-            {/* Affichage de l'image */}
-            <div className="relative h-48 w-full bg-gray-100">
-              {dish.image ? (
-                <img 
-                  className="object-cover w-full h-full"
-                  src={`http://resto-api.test/storage/${dish.image}`}     // Chemin relatif au dossier public
-                  alt={dish.name} 
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-400">
-                  Pas de photo
-                </div>
-              )}
+      {/* --- SLIM NAVIGATION --- */}
+      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200/60 px-6 py-3">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 relative rounded-lg overflow-hidden border border-stone-200">
+               <Image src="/logo.jpg" alt="Logo" fill className="object-cover" />
             </div>
-
-            <h2 className="text-xl font-semibold text-gray-700">{dish.name}</h2>
-            <p className="text-gray-500 my-2">{dish.description}</p>
-            <div className="flex justify-between items-center mt-4">
-              <span className="text-lg font-medium text-green-600">{dish.price} Fcfa</span>
-              <button 
-                onClick={() => handleOrder(dish.id)}
-                className="bg-orange-500 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
-              >
-                Commander
-              </button>
-            </div>
+            <span className="text-xs font-bold tracking-widest uppercase text-stone-500">Un Instant</span>
           </div>
-        ))}
+
+          <div className="flex items-center gap-4">
+            <span className="hidden sm:inline text-xs text-stone-400 italic">Bienvenue, {userName}</span>
+            <div className="h-4 w-[1px] bg-stone-200 hidden sm:block"></div>
+            <button 
+              onClick={logout}
+              className="text-[11px] font-bold uppercase tracking-wider text-stone-500 hover:text-red-600 transition-colors"
+            >
+              Déconnexion
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-6xl mx-auto px-6 pt-8">
+        
+        {/* --- PLAT DU JOUR: COMPACT HERO --- */}
+        {platDuJour && (
+          <section className="mb-12">
+            <div className="bg-white rounded-2xl overflow-hidden border border-stone-200 shadow-sm flex flex-col md:flex-row md:h-[320px]">
+              {/* Left Side: Controlled Image Size */}
+              <div className="relative w-full md:w-2/5 h-48 md:h-full overflow-hidden border-b md:border-b-0 md:border-r border-stone-100">
+                {platDuJour.image ? (
+                  <img 
+                    src={`http://resto-api.test/storage/${platDuJour.image}`}
+                    alt={platDuJour.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-stone-100 flex items-center justify-center text-xs text-stone-400 uppercase tracking-tighter">Pas d'image</div>
+                )}
+                <div className="absolute top-4 left-4 bg-stone-900/90 text-white px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">
+                  ⭐ Plat du Jour
+                </div>
+              </div>
+
+              {/* Right Side: Content */}
+              <div className="p-8 md:w-3/5 flex flex-col justify-center">
+                <div className="flex justify-between items-start mb-2">
+                  <h1 className="text-2xl font-semibold text-stone-800 tracking-tight">{platDuJour.name}</h1>
+                  <span className="text-xl font-medium text-amber-600">{platDuJour.price} <small className="text-[10px] text-stone-400">FCFA</small></span>
+                </div>
+                <p className="text-stone-500 text-sm leading-relaxed mb-8 max-w-md">
+                  {platDuJour.description}
+                </p>
+                
+                <div>
+                  <button 
+                    onClick={() => handleOrder(platDuJour.id)}
+                    className="w-full md:w-auto bg-stone-900 text-white px-10 py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-amber-700 transition-all active:scale-[0.98]"
+                  >
+                    Commander maintenant
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* --- CATEGORY HEADER --- */}
+        <div className="flex items-center gap-4 mb-8">
+          <h2 className="text-xs font-black uppercase tracking-[0.3em] text-stone-400">Autres plats</h2>
+          <div className="h-[1px] flex-grow bg-stone-200"></div>
+          <Link href="/admin" className="text-[10px] font-bold uppercase text-stone-400 hover:text-stone-900">Admin</Link>
+        </div>
+
+        {/* --- COMPACT GRID --- */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {otherDishes.map((dish) => (
+            <div key={dish.id} className="group bg-white rounded-xl border border-stone-200 hover:border-stone-300 hover:shadow-md transition-all duration-300 flex flex-col h-full">
+              {/* Small Image Header */}
+              <div className="relative h-40 overflow-hidden rounded-t-xl">
+                {dish.image ? (
+                  <img 
+                    className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+                    src={`http://resto-api.test/storage/${dish.image}`} 
+                    alt={dish.name} 
+                  />
+                ) : (
+                  <div className="w-full h-full bg-stone-50 flex items-center justify-center text-[10px] text-stone-300">NO PHOTO</div>
+                )}
+                
+                {dish.orders_count > 0 && (
+                  <div className="absolute top-2 right-2 bg-white/90 backdrop-blur text-[9px] font-bold px-2 py-0.5 rounded-md border border-stone-100 shadow-sm">
+                    {dish.orders_count} COMMANDES
+                  </div>
+                )}
+              </div>
+
+              {/* Card Body */}
+              <div className="p-5 flex flex-col flex-grow">
+                <div className="flex justify-between items-start mb-1">
+                  <h3 className="text-sm font-bold text-stone-800 leading-tight">{dish.name}</h3>
+                  <span className="text-xs font-bold text-stone-500">{dish.price} <small className="text-[10px] text-stone-400">FCFA</small></span>
+                </div>
+                
+                <p className="text-xs text-stone-400 leading-normal mb-6 line-clamp-2">
+                  {dish.description}
+                </p>
+
+                <button 
+                  onClick={() => handleOrder(dish.id)}
+                  className="mt-auto w-full py-2.5 bg-stone-50 border border-stone-200 rounded-lg text-[10px] font-bold uppercase tracking-widest text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all active:scale-[0.97]"
+                >
+                  Commander
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
       </div>
+
+      <footer className="mt-16 text-center">
+        <p className="text-[10px] font-bold text-stone-300 tracking-[0.4em] uppercase">Bon Appétit</p>
+      </footer>
     </main>
   );
 }

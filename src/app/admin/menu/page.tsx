@@ -16,10 +16,16 @@ interface Dish {
   image: string;
   orders_count: number;
 }
+interface Menu {
+  id: number;
+  menu_date: Date;
+  is_published: boolean;
+  dish_ids: Dish[];
+}
 
 export default function AdminPage() {
   const [dishes, setDishes] = useState<Dish[]>([]);
-  //const [form, setForm] = useState({ name: "", description: "", price: "", image:""});
+  const [menus, setMenus] = useState<Menu[]>([]);
   const router = useRouter();
 
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -37,7 +43,7 @@ export default function AdminPage() {
 
   //  Charger les données (Plats)
   const fetchData = async () => {
-    const res = await fetch("http://resto-api.test/api/dishes");
+    const res = await apiFetch("/dishes");
     const data = await res.json();
     setDishes(data);
   };

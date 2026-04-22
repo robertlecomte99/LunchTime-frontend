@@ -2,6 +2,7 @@
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 import { useEffect, useState } from "react";
+import { apiFetch } from '@/lib/api';
 //import Link from "next/link";
 //import { toast } from 'sonner';
 
@@ -12,14 +13,21 @@ interface Dish {
   price: string;
   orders_count: number;
 }
-
+interface Menu {
+  id: number;
+  menu_date: Date;
+  is_published: boolean;
+  dish_ids: Dish[];
+}
 export default function AdminPage() {
 
   const [dishes, setDishes] = useState<Dish[]>([]);
+  const [menus, setMenus] = useState<Menu[]>([]);
+
   
   //  Charger les données (Plats + KPIs)
   const fetchData = async () => {
-    const res = await fetch("http://resto-api.test/api/dishes");
+    const res = await apiFetch("/dishes");
     const data = await res.json();
     setDishes(data);
   };
