@@ -16,32 +16,54 @@ interface Dish {
   orders_count: number;
 }
 
+interface Menu {
+  id: number;
+  menu_date: string;
+  dishes: Dish[];
+}
+
 export default function Home() {
-  const [dishes, setDishes] = useState<Dish[]>([]);
+  const [todayMenu, setTodayMenu] = useState<Menu | null>(null);
   const [loading, setLoading] = useState(true);
   const userName = Cookies.get('userName');
 
   useEffect(() => {
-    apiFetch("/dishes")
-      .then((res) => res.json())
+    // On appelle le menu du jour au lieu de tous les plats
+    apiFetch("/menus/current")
+      .then((res) => {
+        if (!res.ok) throw new Error("Pas de menu");
+        return res.json();
+      })
       .then((data) => {
-        setDishes(data);
+        setTodayMenu(data);
         setLoading(false);
       })
-      .catch(err => console.error("Erreur API:", err));
+      .catch(() => {
+        setTodayMenu(null);
+        setLoading(false);
+      });
   }, []);
 
   const handleOrder = async (dishId: number) => {
-    const res = await fetch("http://resto-api.test/api/orders", {
+    if (!todayMenu) return;
+
+    const res = await apiFetch("/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ dish_id: dishId }),
+      body: JSON.stringify({ 
+        dish_id: dishId,
+        menu_id: todayMenu.id 
+      }),
     });
 
-    if (res.ok) {
-      toast.success("Commande enregistrée");
+    if (res.status === 201) {
+      toast.success("Commande enregistrée avec succès !");
+    } else if (res.status === 429) {
+      // 429 Too Many Requests: Limite atteinte
+      const data = await res.json();
+      toast.error(data.message || "Limite de commandes atteinte (2 max).");
     } else {
-      toast.error("Échec de la commande");
+      toast.error("Échec de la commande.");
     }
   };
 
@@ -50,19 +72,23 @@ export default function Home() {
     window.location.href = "/login"; 
   };
 
-  if (loading) return (
-    <div className="flex h-screen items-center justify-center bg-stone-50">
-      <div className="animate-pulse text-stone-400 text-sm tracking-widest uppercase font-medium">Chargement...</div>
-    </div>
-  );
+  if (loading) return (/* ton loader actuel */ <div className="flex h-screen items-center justify-center bg-stone-50"><div className="animate-pulse">Chargement...</div></div>);
 
-  const platDuJour = dishes[0];
-  const otherDishes = dishes.slice(1);
+  if (!todayMenu || todayMenu.dishes.length === 0) {
+    return (
+      <div className="flex flex-col h-screen items-center justify-center bg-stone-50 text-center">
+        <h1 className="text-2xl font-bold text-stone-800">Aucun menu publié</h1>
+        <p className="text-stone-500 mt-2">Revenez un peu plus tard pour commander votre repas du jour.</p>
+        <button onClick={logout} className="mt-6 text-sm underline text-stone-400">Déconnexion</button>
+      </div>
+    );
+  }
+
+  const platDuJour = todayMenu.dishes[0];
+  const otherDishes = todayMenu.dishes.slice(1);
 
   return (
     <main className="min-h-screen bg-stone-50 font-sans text-stone-900 antialiased pb-12">
-      
-      {/* --- SLIM NAVIGATION --- */}
       <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200/60 px-6 py-3">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -84,9 +110,13 @@ export default function Home() {
           </div>
         </div>
       </nav>
-
+      
       <div className="max-w-6xl mx-auto px-6 pt-8">
-        
+        {/* Affichage d'un petit badge date */}
+        <div className="mb-6 inline-block bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase">
+          Menu du : {new Date(todayMenu.menu_date).toLocaleDateString('fr-FR')}
+        </div>
+
         {/* --- PLAT DU JOUR: COMPACT HERO --- */}
         {platDuJour && (
           <section className="mb-12">
@@ -181,12 +211,7 @@ export default function Home() {
             </div>
           ))}
         </div>
-
       </div>
-
-      <footer className="mt-16 text-center">
-        <p className="text-[10px] font-bold text-stone-300 tracking-[0.4em] uppercase">Bon Appétit</p>
-      </footer>
     </main>
   );
 }

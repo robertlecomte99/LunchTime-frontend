@@ -19,8 +19,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link href="/admin" className="block p-3 rounded-lg hover:bg-slate-800 transition font-medium border-l-4 border-transparent hover:border-orange-500">
             📊 Dashboard
           </Link>
-          <Link href="/admin/menu" className="block p-3 rounded-lg hover:bg-slate-800 transition font-medium border-l-4 border-transparent hover:border-orange-500">
+          <Link href="/admin/dishes" className="block p-3 rounded-lg hover:bg-slate-800 transition font-medium border-l-4 border-transparent hover:border-orange-500">
             🍔 Gestion des plats
+          </Link>
+          <Link href="/admin/menu" className="block p-3 rounded-lg hover:bg-slate-800 transition font-medium border-l-4 border-transparent hover:border-orange-500">
+            📝 Gestion du Menu
           </Link>
           <Link href="/admin/orders" className="block p-3 rounded-lg hover:bg-slate-800 transition font-medium border-l-4 border-transparent hover:border-orange-500">
             🔔 Suivi des commandes en cours
