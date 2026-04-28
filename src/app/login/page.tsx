@@ -24,7 +24,10 @@ export default function LoginPage() {
       if (res.ok) {
         const data = await res.json();
         Cookies.set('token', data.token, { expires: 1 }); 
-        Cookies.set('role', data.user.role, { expires: 7 });
+        Cookies.set('role', data.user.role, { 
+          expires: 7, 
+          path: '/' // TRÈS IMPORTANT : rend le cookie visible sur tout le site
+        });        
         Cookies.set('userName', data.user.name)
         //localStorage.setItem("token", data.token); // On stocke le jeton
         

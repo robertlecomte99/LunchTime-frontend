@@ -1,344 +1,246 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-//import Link from "next/link";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { apiFetch } from "@/lib/api";
-
-import { useRouter } from "next/navigation";
-import { toast } from 'sonner';
-
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { toast } from "sonner";
 
 interface Dish {
   id: number;
   name: string;
   description: string;
   price: string;
-  image: string;
+  image: string | null;
+  type_plat: string;
   orders_count: number;
 }
-interface Menu {
-  id: number;
-  menu_date: Date;
-  is_published: boolean;
-  dish_ids: Dish[];
-}
 
-export default function AdminPage() {
+export default function DishesListPage() {
   const [dishes, setDishes] = useState<Dish[]>([]);
-  const [menus, setMenus] = useState<Menu[]>([]);
-  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [sortConfig, setSortConfig] = useState({ key: "orders_count", direction: "desc" });
+  const [deleteTarget, setDeleteTarget] = useState<Dish | null>(null);
+  const [search, setSearch] = useState("");
 
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [sortConfig, setSortConfig] = useState({ key: 'orders_count', direction: 'desc' });
-  const [errors, setErrors] = useState({});
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [file, setFile] = useState<File | null>(null);
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [image, setImage] = useState("");
-  const [description, setDescription] = useState("");
-  
-
-  //  Charger les données (Plats)
-  const fetchData = async () => {
+  const fetchDishes = async () => {
     const res = await apiFetch("/dishes");
     const data = await res.json();
     setDishes(data);
+    setLoading(false);
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchDishes(); }, []);
 
-  // 
-  const startEdit = (dish: Dish) => {
-    setEditingId(dish.id);
-    //setForm({name: dish.name,description: dish.description || "",price: dish.price,image: dish.image});
-    setName(dish.name);
-    setDescription(dish.description || "");
-    setPrice(dish.price);
-    setImage(dish.image);
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    const res = await apiFetch(`/dishes/${deleteTarget.id}`, { method: "DELETE" });
+    if (res.ok) {
+      toast.success(`"${deleteTarget.name}" supprimé.`);
+      fetchDishes();
+    } else {
+      toast.error("Erreur lors de la suppression.");
+    }
+    setDeleteTarget(null);
   };
 
-  const handleResetFile = () => {
-    setFile(null); 
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""; // On vide l'input physiquement
-    }
-  };
-  // Ajouter ou modifier un plat
- const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  
-  //const token = localStorage.getItem("token"); ancienne methode de recup token
-  const url = editingId 
-    ? `/dishes/${editingId}` 
-    : "/dishes";
-  //const method = editingId ? "PUT" : "POST";
-  const message = editingId ? "Plat mis à jour avec succés" : "Plat ajouté avec succés";
-  const formData = new FormData();
-  formData.append('name', name);
-  formData.append('description', description);
-  formData.append('price', price.toString());
-  
-  if (file) {
-      formData.append('image', file); //fichier binaire
-  }
-
-  if (editingId) {
-      formData.append('_method', 'PUT');
-  }
-
-  const res=await apiFetch(url, {
-    method: "POST",
-    //headers: { "Content-Type": "Application/JSON"},
-    body: formData,
-  });
-
-  if (res.status === 401) {
-    // Si le token est expiré ou invalide, on redirige vers le login
-    router.push("/login");
-    return;
-  }
-  if (res.status === 422) {
-    const data = await res.json();
-    setErrors(data.errors); // Laravel renvoie les erreurs par champ
-  }  
-    
-  if (res.ok) {
-    toast.success(message);
-  } else {
-    toast.error("Échec de la requête.");
-  }
-
-  // Reset
-  handleResetFile();
-  setEditingId(null);
-  //setForm({ name: "", description: "", price: "",image: ""});
-  setName("");
-  setDescription("");
-  setPrice("");
-  fetchData();
-  setImage("");
-  
-};
-
-  //  Supprimer un plat
-  const handleDelete = async (id: number) => {
-    if (confirm("Supprimer ce plat ?")) {
-      //await fetch(`http://resto-api.test/api/dishes/${id}`, { method: "DELETE" });
-      //fetchData();
-      const res = await apiFetch(`/dishes/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        toast.success("Le plat a été supprimé !");
-        fetchData();
-      } else {
-        toast.error("Erreur lors de la suppression.");
-      }
-    }
+  const requestSort = (key: string) => {
+    setSortConfig((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === "desc" ? "asc" : "desc",
+    }));
   };
 
+  const filtered = dishes.filter((d) =>
+    d.name.toLowerCase().includes(search.toLowerCase())
+  );
 
-  //Gestion de tri
-  const sortedDishes = [...dishes].sort((a, b) => {
-    // On récupère les valeurs à comparer (ex: a['price'] ou a['orders_count'])
-    const aValue = a[sortConfig.key as keyof Dish];
-    const bValue = b[sortConfig.key as keyof Dish];
-
-    if (aValue < bValue) {
-      return sortConfig.direction === 'asc' ? -1 : 1;
-    }
-    if (aValue > bValue) {
-      return sortConfig.direction === 'asc' ? 1 : -1;
-    }
+  const sorted = [...filtered].sort((a, b) => {
+    const av = a[sortConfig.key as keyof Dish];
+    const bv = b[sortConfig.key as keyof Dish];
+    if (av < bv) return sortConfig.direction === "asc" ? -1 : 1;
+    if (av > bv) return sortConfig.direction === "asc" ? 1 : -1;
     return 0;
   });
 
-  const requestSort = (key: string) => {
-  let direction = 'desc';
-  // Si on clique sur la même colonne, on inverse juste la direction
-  if (sortConfig.key === key && sortConfig.direction === 'desc') {
-    direction = 'asc';
-  }
-  setSortConfig({ key, direction });
-};
-
-
+  const SortIcon = ({ col }: { col: string }) =>
+    sortConfig.key === col ? (
+      <svg className="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
+          d={sortConfig.direction === "asc" ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
+      </svg>
+    ) : (
+      <svg className="w-3.5 h-3.5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+      </svg>
+    );
 
   return (
-    <div className="p-8 bg-gray-100 min-h-screen font-sans">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-slate-800">Gestion des plats à la carte</h1>
+    <div className="p-8 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-black text-gray-900 tracking-tight">Catalogue des plats</h1>
+          <p className="text-sm text-gray-400 mt-1">{dishes.length} plat(s) enregistré(s)</p>
         </div>
-                
+        <Link
+          href="/admin/dishes/add"
+          className="inline-flex items-center gap-2 bg-[#1A1D2E] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#252840] transition-colors shadow-sm"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Ajouter un plat
+        </Link>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* --- FORMULAIRE D'AJOUT --- */}
-          <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-sm h-fit border border-gray-200">
-            <h2 className="text-lg font-bold mb-4 text-slate-800">
-              {editingId ? "📝 Modifier le Plat" : "➕ Ajouter un Plat"}
-            </h2>
-            <div className="space-y-4">
-              <input 
-                type="text" 
-                placeholder="Nom du plat" 
-                className="w-full p-2 border rounded bg-white text-slate-900 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 outline-none" 
-                value={name}
-                onChange={e => setName(e.target.value)} 
-                required 
-              />
-              <textarea 
-                placeholder="Description" 
-                className="w-full p-2 border rounded bg-white text-slate-900 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 outline-none" 
-                value={description} 
-                onChange={e => setDescription(e.target.value)} 
-              />
-              <input 
-                type="number" 
-                min="0"
-                step="500" 
-                placeholder="Prix" 
-                className="w-full p-2 border rounded bg-white text-slate-900 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 outline-none" 
-                value={price} 
-                onChange={e => setPrice(e.target.value)} 
-                required 
-              />
-              
-              <div className="flex flex-col gap-2 text-gray-400">
-                
-                  <input 
-                    type="file" 
-                    ref={fileInputRef}
-                    id="image"
-                    accept="image/*"
-                    onChange={(e) => {
-                      if (e.target.files) {
-                        setFile(e.target.files[0]); //stockage du fichier dans un state
-                      }
-                    }}
-                    className="border p-2 rounded"
-                  />
-                  {file && (
-                    <button
-                      type="button"
-                      onClick={handleResetFile}
-                      className="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-700 transition-colors"
-                      title="Supprimer le fichier"
-                    >
-                      ✕
-                    </button>
-                  )}
-                
-                {file ? (
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">Aperçu :</p>
-                    <img 
-                      src={URL.createObjectURL(file)} 
-                      alt="Aperçu" 
-                      className="w-20 h-20 object-cover rounded border"
-                    />
-                  </div>
-                ):(
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">Aperçu :</p>
-                    <img 
-                      src={`http://resto-api.test/storage/${image}`} 
-                      alt="Aperçu" 
-                      className="w-20 h-20 object-cover rounded border"
-                    />
-                  </div>
-                )}
+      {/* Search */}
+      <div className="relative mb-6">
+        <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Rechercher un plat…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-400/30 focus:border-amber-400 transition-all"
+        />
+      </div>
 
-              </div>
-
-              <div className="flex gap-2">
-                <button className="flex-1 bg-slate-800 text-white py-2 rounded font-bold hover:bg-slate-900 transition">
-                  {editingId ? "Mettre à jour" : "Enregistrer"}
-                </button>
-                {editingId && (
-                  <button 
-                    type="button" 
-                    onClick={() => { setEditingId(null); setName("");setDescription("");setPrice("");setImage(""); handleResetFile}}
-                    className="bg-gray-200 text-gray-700 px-4 py-2 rounded font-bold"
-                  >
-                    Annuler
-                  </button>
-                )}
-              </div>
-            </div>
-          </form>
-
-          {/* --- LISTE DE GESTION --- */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <table className="w-full text-left border-collapse">
-              <thead className="bg-slate-200 border-b-2 border-slate-300">
-                <tr>
-                  
-                  <th 
-                    onClick={() => requestSort('name')} 
-                    className="p-4 cursor-pointer text-slate-900 font-bold hover:bg-slate-300 transition-colors"
-                  >
-                    <div className="flex items-center gap-1">
-                      NOM {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                    </div>
-                  </th>
-
-                  <th 
-                    onClick={() => requestSort('price')} 
-                    className="p-4 cursor-pointer text-slate-900 font-bold hover:bg-slate-300 transition-colors"
-                  >
-                    <div className="flex items-center gap-1">
-                      PRIX {sortConfig.key === 'price' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                    </div>
-                  </th>
-
-                  <th 
-                    onClick={() => requestSort('orders_count')} 
-                    className="p-4 cursor-pointer text-slate-900 font-bold hover:bg-slate-300 transition-colors text-center"
-                  >
-                    <div className="flex items-center justify-center gap-1">
-                      VENTES {sortConfig.key === 'orders_count' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                    </div>
-                  </th>
-
-                  <th className="p-4 text-center text-slate-900 font-bold">
-                    ACTIONS
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedDishes.map(dish => (
-                  <tr key={dish.id} className="border-b hover:bg-slate-50 transition">
-                    {/* On force text-slate-900 ici */}
-                    <td className="p-4 font-semibold text-slate-900">{dish.name}</td>
-                    <td className="p-4 text-slate-700 font-medium">{dish.price} fcfa</td>
-                    <td className="p-4 text-center">
-                        <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold border border-orange-200">
-                          {dish.orders_count}
-                        </span>
+      {/* Table */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-gray-100">
+              <th className="px-6 py-4 text-left">
+                <span className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Plat</span>
+              </th>
+              <th
+                className="px-6 py-4 text-left cursor-pointer select-none group"
+                onClick={() => requestSort("type_plat")}
+              >
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-gray-600 transition-colors">
+                  Type <SortIcon col="type_plat" />
+                </span>
+              </th>
+              <th
+                className="px-6 py-4 text-left cursor-pointer select-none group"
+                onClick={() => requestSort("price")}
+              >
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-gray-600 transition-colors">
+                  Prix <SortIcon col="price" />
+                </span>
+              </th>
+              <th
+                className="px-6 py-4 text-center cursor-pointer select-none group"
+                onClick={() => requestSort("orders_count")}
+              >
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-gray-600 transition-colors">
+                  Ventes <SortIcon col="orders_count" />
+                </span>
+              </th>
+              <th className="px-6 py-4 text-right">
+                <span className="text-[11px] font-bold uppercase tracking-widest text-gray-400">Actions</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-50">
+            {loading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={i}>
+                  {Array.from({ length: 5 }).map((_, j) => (
+                    <td key={j} className="px-6 py-4">
+                      <div className="h-4 bg-gray-100 rounded-lg animate-pulse" />
                     </td>
-                    <td className="p-4 text-right">
-                      <button 
-                        onClick={() => startEdit(dish)} 
-                        className="text-indigo-600 hover:text-indigo-800 text-sm font-bold"
+                  ))}
+                </tr>
+              ))
+            ) : sorted.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-6 py-16 text-center text-sm text-gray-400">
+                  Aucun plat trouvé.
+                </td>
+              </tr>
+            ) : (
+              sorted.map((dish) => (
+                <tr key={dish.id} className="hover:bg-gray-50/60 transition-colors group">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+                        {dish.image ? (
+                          <img
+                            src={`http://resto-api.test/storage/${dish.image}`}
+                            alt={dish.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">?</div>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-800">{dish.name}</p>
+                        <p className="text-xs text-gray-400 truncate max-w-[200px]">{dish.description}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-semibold">
+                      {dish.type_plat || "standard"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="text-sm font-bold text-gray-700">
+                      {parseInt(dish.price).toLocaleString("fr-FR")} <span className="text-xs font-normal text-gray-400">FCFA</span>
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold ${
+                      dish.orders_count > 0 ? "bg-amber-50 text-amber-700" : "bg-gray-50 text-gray-400"
+                    }`}>
+                      {dish.orders_count}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Link
+                        href={`/admin/dishes/add?edit=${dish.id}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 text-xs font-semibold hover:bg-gray-200 transition-colors"
                       >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
                         Modifier
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(dish.id)} 
-                        className="text-red-600 hover:text-red-800 text-sm font-bold p-2 hover:bg-red-50 rounded-lg transition"
+                      </Link>
+                      <button
+                        onClick={() => setDeleteTarget(dish)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-colors"
                       >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
                         Supprimer
                       </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Supprimer le plat"
+        message={`Êtes-vous sûr de vouloir supprimer "${deleteTarget?.name}" ? Cette action est irréversible.`}
+        confirmLabel="Supprimer"
+        cancelLabel="Annuler"
+        variant="danger"
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }
