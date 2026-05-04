@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
@@ -13,7 +13,8 @@ interface DishForm {
   type_plat: string;
 }
 
-export default function DishFormPage() {
+
+function DishFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get("edit");
@@ -94,6 +95,8 @@ export default function DishFormPage() {
     : null;
 
   const typeOptions = ["standard", "entrée", "plat principal", "dessert", "boisson"];
+
+
 
   return (
     <div className="p-8 max-w-3xl mx-auto">
@@ -292,5 +295,13 @@ export default function DishFormPage() {
         onCancel={() => setShowResetDialog(false)}
       />
     </div>
+  );
+}
+
+export default function DishFormPage() {
+  return (
+    <Suspense fallback={<div>Chargement des plats...</div>}>
+      <DishFormContent />
+    </Suspense>
   );
 }
