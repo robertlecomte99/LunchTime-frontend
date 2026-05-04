@@ -26,12 +26,13 @@ export default function LoginPage() {
         Cookies.set('token', data.token, { expires: 1 }); 
         Cookies.set('role', data.user.role, { 
           expires: 7, 
-          path: '/' // TRÈS IMPORTANT : rend le cookie visible sur tout le site
-        });        
+          path: '/' 
+        });   
+        Cookies.set('permissions', JSON.stringify(data.user.permissions), { expires: 7 });     
         Cookies.set('userName', data.user.name)
         //localStorage.setItem("token", data.token); // On stocke le jeton
-        
-        if (data.user.role !== "admin") {
+
+        if (JSON.stringify(data.user.permissions).includes('get_admin_panel')) {
           router.push("/admin"); 
         }else {
           router.push("/"); 

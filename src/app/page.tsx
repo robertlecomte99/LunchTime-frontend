@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { apiFetch } from "@/lib/api";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { Can } from '@/components/Can';
+
 
 interface Dish {
   id: number;
@@ -296,6 +298,16 @@ export default function Home() {
             </div>
           </>
         )}
+      </div>
+      <div className="fixed bottom-4 right-4">
+        <Can do="get_admin_panel">
+          <button
+              onClick={() => (window.location.href = "/admin")}
+              className="text-[11px] font-bold uppercase tracking-wider text-stone-500 hover:text-blue-600 transition-colors"
+            >
+              Accès Admin
+            </button>
+        </Can>
       </div>
 
       {/* Confirm dialog */}

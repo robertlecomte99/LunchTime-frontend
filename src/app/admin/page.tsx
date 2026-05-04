@@ -123,7 +123,7 @@ export default function AdminDashboard() {
                 />
                 <Bar dataKey="ventes" radius={[6, 6, 0, 0]}>
                   {chartData.map((entry, i) => (
-                    <Cell key={i} fill={entry.ventes === maxSales && maxSales > 0 ? "#f59e0b" : "#e2e8f0"} />
+                    <Cell key={i} fill={entry.ventes === maxSales && maxSales > 0 ? "#f59e0b" : "#3182ce"} />
                   ))}
                 </Bar>
               </BarChart>

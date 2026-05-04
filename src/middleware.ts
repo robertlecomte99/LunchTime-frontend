@@ -5,6 +5,8 @@ export function middleware(request: NextRequest) {
   // 1. On récupère le token dans les cookies (plus fiable que le localStorage pour le middleware)
   const token = request.cookies.get('token')?.value
   const role = request.cookies.get('role')?.value; 
+  const permissions = JSON.parse(request.cookies.get('permissions')?.value || '[]');
+
 
   // 2. On définit les routes à protéger
 
@@ -20,14 +22,14 @@ export function middleware(request: NextRequest) {
   // --- 2. GESTION DU LOGIN ---
   // Si l'utilisateur est déjà connecté et va sur /login, on le redirige selon son rôle
   if (token && isLoginPage) {
-    return role === 'admin' 
+    return permissions.includes('get_admin_panel') 
       ? NextResponse.redirect(new URL('/admin', request.url)) 
       : NextResponse.redirect(new URL('/', request.url));
   }
 
   // --- 3. AUTORISATIONS PAR RÔLE ---
   // RÈGLE : Un client peut PAS aller en Admin
-  if (isAdminPage && role !== 'admin') {
+  if (isAdminPage && !permissions.includes('get_admin_panel')) {
     // On le renvoie vers la racine (le menu)
     return NextResponse.redirect(new URL('/', request.url));
   }
