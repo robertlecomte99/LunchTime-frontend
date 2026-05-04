@@ -11,7 +11,7 @@ export const apiFetch = async (url: string, options: RequestInit = {}) => {
     
   };
 
-  const response = await fetch(`http://resto-api.test/api${url}`, {
+  const response = await fetch(`http://LunchTime-api.test/api${url}`, {
     ...options,
     headers: {
       ...defaultHeaders,

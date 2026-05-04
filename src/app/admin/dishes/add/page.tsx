@@ -90,7 +90,7 @@ export default function DishFormPage() {
   const previewUrl = file
     ? URL.createObjectURL(file)
     : existingImage
-    ? `http://resto-api.test/storage/${existingImage}`
+    ? `http://LunchTime-api.test/storage/${existingImage}`
     : null;
 
   const typeOptions = ["standard", "entrée", "plat principal", "dessert", "boisson"];

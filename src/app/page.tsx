@@ -139,7 +139,7 @@ export default function Home() {
             <div className="w-8 h-8 relative rounded-lg overflow-hidden border border-stone-200">
               <Image src="/logo.jpg" alt="Logo" fill className="object-cover" />
             </div>
-            <span className="text-xs font-bold tracking-widest uppercase text-stone-500">Un Instant</span>
+            <span className="text-xs font-bold tracking-widest uppercase text-stone-500">Lunch-Time</span>
           </div>
 
           {/* Deadline banner */}
@@ -191,7 +191,7 @@ export default function Home() {
             <div className="relative w-full md:w-2/5 h-48 md:h-full overflow-hidden">
               {featured.image ? (
                 <img
-                  src={`http://resto-api.test/storage/${featured.image}`}
+                  src={`http://LunchTime-api.test/storage/${featured.image}`}
                   alt={featured.name}
                   className="w-full h-full object-cover"
                 />
@@ -251,7 +251,7 @@ export default function Home() {
                     {dish.image ? (
                       <img
                         className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100"
-                        src={`http://resto-api.test/storage/${dish.image}`}
+                        src={`http://LunchTime-api.test/storage/${dish.image}`}
                         alt={dish.name}
                       />
                     ) : (

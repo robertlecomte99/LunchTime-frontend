@@ -84,7 +84,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <span className="text-white font-black text-xs">UI</span>
             </div>
             <div>
-              <p className="text-white font-bold text-sm tracking-tight">Un Instant</p>
+              <p className="text-white font-bold text-sm tracking-tight">Lunch-Time</p>
               <p className="text-white/40 text-[10px] uppercase tracking-widest">Admin Panel</p>
             </div>
           </div>

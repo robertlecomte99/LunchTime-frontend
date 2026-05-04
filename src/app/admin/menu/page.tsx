@@ -204,7 +204,7 @@ export default function MenuAdminPage() {
                           <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                             {dish.image ? (
                               <img
-                                src={`http://resto-api.test/storage/${dish.image}`}
+                                src={`http://LunchTime-api.test/storage/${dish.image}`}
                                 alt={dish.name}
                                 className="w-full h-full object-cover"
                               />
