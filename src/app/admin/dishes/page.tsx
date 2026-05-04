@@ -57,8 +57,8 @@ export default function DishesListPage() {
   );
 
   const sorted = [...filtered].sort((a, b) => {
-    const av = a[sortConfig.key as keyof Dish];
-    const bv = b[sortConfig.key as keyof Dish];
+    const av = a[sortConfig.key as keyof Dish] ?? "";;
+    const bv = b[sortConfig.key as keyof Dish] ?? "";;
     if (av < bv) return sortConfig.direction === "asc" ? -1 : 1;
     if (av > bv) return sortConfig.direction === "asc" ? 1 : -1;
     return 0;
