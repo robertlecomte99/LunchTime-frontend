@@ -191,7 +191,7 @@ export default function Home() {
             <div className="relative w-full md:w-2/5 h-48 md:h-full overflow-hidden">
               {featured.image ? (
                 <img
-                  src={`http://LunchTime-api.test/storage/${featured.image}`}
+                  src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${featured.image}`}
                   alt={featured.name}
                   className="w-full h-full object-cover"
                 />
@@ -251,7 +251,7 @@ export default function Home() {
                     {dish.image ? (
                       <img
                         className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100"
-                        src={`http://LunchTime-api.test/storage/${dish.image}`}
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${dish.image}`}
                         alt={dish.name}
                       />
                     ) : (

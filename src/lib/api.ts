@@ -11,7 +11,7 @@ export const apiFetch = async (url: string, options: RequestInit = {}) => {
     
   };
 
-  const response = await fetch(`http://LunchTime-api.test/api${url}`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api${url}`, {
     ...options,
     headers: {
       ...defaultHeaders,

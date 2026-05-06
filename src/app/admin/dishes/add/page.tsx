@@ -91,7 +91,7 @@ function DishFormContent() {
   const previewUrl = file
     ? URL.createObjectURL(file)
     : existingImage
-    ? `http://LunchTime-api.test/storage/${existingImage}`
+    ? `${process.env.NEXT_PUBLIC_API_URL}/storage/${existingImage}`
     : null;
 
   const typeOptions = ["standard", "entrée", "plat principal", "dessert", "boisson"];

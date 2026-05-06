@@ -171,7 +171,7 @@ export default function DishesListPage() {
                       <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
                         {dish.image ? (
                           <img
-                            src={`http://LunchTime-api.test/storage/${dish.image}`}
+                            src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${dish.image}`}
                             alt={dish.name}
                             className="w-full h-full object-cover"
                           />
