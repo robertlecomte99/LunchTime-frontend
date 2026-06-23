@@ -134,9 +134,9 @@ export default function Home() {
     <main className="min-h-screen bg-stone-50 font-sans text-stone-900 antialiased pb-12">
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200/60 px-6 py-3">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
+        <div className="max-w-3xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 relative rounded-lg overflow-hidden border border-stone-200">
+            <div className="w-7 h-7 relative rounded-lg overflow-hidden border border-stone-200">
               <Image src="/logo.jpg" alt="Logo" fill className="object-cover" />
             </div>
             <span className="text-xs font-bold tracking-widest uppercase text-stone-500">Lunch-Time</span>
@@ -146,22 +146,22 @@ export default function Home() {
           {deadlinePassed ? (
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-200 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
-              <span className="text-xs font-bold text-red-600">Commandes fermées</span>
+              <span className="text-xs font-semibold text-red-600">Commandes fermées</span>
             </div>
           ) : (
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-xs font-bold text-green-700">
+              <span className="text-xs font-semibold text-green-700">
                 Ouvert jusqu'à {todayMenu.order_deadline}
               </span>
             </div>
           )}
 
           <div className="flex items-center gap-4">
-            <span className="hidden sm:inline text-xs text-stone-400 italic">Bienvenue, {userName}</span>
+            <span className="hidden sm:inline text-xs text-stone-400">{userName}</span>
             <button
               onClick={logout}
-              className="text-[11px] font-bold uppercase tracking-wider text-stone-500 hover:text-red-600 transition-colors"
+              className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 hover:text-red-500 transition-colors"
             >
               Déconnexion
             </button>
@@ -171,24 +171,24 @@ export default function Home() {
 
       {/* Deadline banner mobile */}
       {deadlinePassed && (
-        <div className="sm:hidden bg-red-600 text-white text-center text-xs font-bold py-2 px-4">
-          ⛔ Les commandes sont fermées pour aujourd'hui
+        <div className="sm:hidden bg-red-50 border-b border-red-200 text-red-600 text-center text-xs font-semibold py-2 px-4">
+          Les commandes sont fermées pour aujourd'hui
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto px-6 pt-8">
+      <div className="max-w-3xl mx-auto px-6 pt-8">
         {/* Date badge */}
-        <div className="mb-6 inline-flex items-center gap-2 bg-amber-100 text-amber-800 px-3 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase">
+        <div className="mb-5 inline-flex items-center gap-2 text-stone-400 text-xs font-semibold tracking-widest uppercase">
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          Menu du {new Date(todayMenu.menu_date).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
+          {new Date(todayMenu.menu_date).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
         </div>
 
-        {/* Plat du jour Hero */}
-        <section className="mb-12">
-          <div className="bg-stone-900 rounded-2xl overflow-hidden border border-stone-800 shadow-sm flex flex-col md:flex-row md:h-[320px]">
-            <div className="relative w-full md:w-2/5 h-48 md:h-full overflow-hidden">
+        {/* Plat du jour */}
+        <section className="mb-8">
+          <div className="bg-white rounded-2xl overflow-hidden border border-stone-200 shadow-sm flex flex-col sm:flex-row sm:h-[200px]">
+            <div className="relative w-full sm:w-2/5 h-36 sm:h-full overflow-hidden flex-shrink-0">
               {featured.image ? (
                 <img
                   src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${featured.image}`}
@@ -196,37 +196,39 @@ export default function Home() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-stone-100 flex items-center justify-center text-xs text-stone-400 uppercase tracking-tighter">
+                <div className="w-full h-full bg-stone-100 flex items-center justify-center text-xs text-stone-400">
                   Pas d'image
                 </div>
               )}
-              <div className="absolute top-4 left-4 bg-stone-900/90 text-white px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5">
-                <svg className="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+              <div className="absolute top-3 left-3 bg-amber-400 text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase flex items-center gap-1">
+                <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
                 Plat du Jour
               </div>
             </div>
 
-            <div className="p-8 md:w-3/5 flex flex-col justify-center">
-              <div className="flex justify-between items-start mb-2">
-                <h1 className="text-2xl font-semibold text-white tracking-tight">{featured.name}</h1>
-                <span className="text-xl font-medium text-amber-600">
-                  {featured.price} <small className="text-[10px] text-stone-300">FCFA</small>
-                </span>
+            <div className="p-6 flex flex-col justify-between flex-1">
+              <div>
+                <div className="flex justify-between items-start mb-1.5">
+                  <h1 className="text-lg font-semibold text-stone-900 tracking-tight">{featured.name}</h1>
+                  <span className="text-sm font-semibold text-amber-600 ml-4 whitespace-nowrap">
+                    {parseInt(featured.price).toLocaleString("fr-FR")} <small className="text-[10px] text-stone-400 font-normal">FCFA</small>
+                  </span>
+                </div>
+                <p className="text-stone-500 text-xs leading-relaxed line-clamp-2">{featured.description}</p>
               </div>
-              <p className="text-stone-400 text-sm leading-relaxed mb-8 max-w-md">{featured.description}</p>
 
               <button
                 onClick={() => !deadlinePassed && setConfirmOrder(featured)}
                 disabled={deadlinePassed}
-                className={`w-full md:w-auto px-10 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all active:scale-[0.98] ${
+                className={`mt-4 self-start px-6 py-2 rounded-lg text-xs font-semibold tracking-wide transition-colors ${
                   deadlinePassed
-                    ? "bg-stone-200 text-stone-400 cursor-not-allowed"
-                    : "bg-white text-black hover:bg-amber-700"
+                    ? "bg-stone-100 text-stone-400 cursor-not-allowed"
+                    : "bg-stone-900 text-white hover:bg-stone-700"
                 }`}
               >
-                {deadlinePassed ? "Commandes fermées" : "Commander maintenant"}
+                {deadlinePassed ? "Commandes fermées" : "Commander"}
               </button>
             </div>
           </div>
@@ -235,59 +237,55 @@ export default function Home() {
         {/* Autres plats */}
         {others.length > 0 && (
           <>
-            <div className="flex items-center gap-4 mb-8">
-              <h2 className="text-xs font-black uppercase tracking-[0.3em] text-stone-400">Autres plats</h2>
-              <div className="h-[1px] flex-grow bg-stone-200" />
+            <div className="flex items-center gap-4 mb-5">
+              <h2 className="text-[10px] font-bold uppercase tracking-[0.25em] text-stone-400 whitespace-nowrap">Autres plats</h2>
+              <div className="h-px flex-grow bg-stone-200" />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-3">
               {others.map((dish) => (
                 <div
                   key={dish.id}
-                  
-                  className="group bg-stone-900 rounded-xl border border-stone-800 hover:border-stone-700 hover:shadow-xl hover:shadow-black/50 transition-all duration-300 flex flex-col h-full"
+                  className="bg-white rounded-xl border border-stone-200 hover:border-stone-300 transition-colors flex items-center gap-4 px-4 py-3"
                 >
-                  <div className="relative h-40 overflow-hidden rounded-t-xl">
+                  {/* Miniature */}
+                  <div className="w-14 h-14 rounded-lg overflow-hidden bg-stone-100 flex-shrink-0">
                     {dish.image ? (
                       <img
-                        className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                        className="object-cover w-full h-full"
                         src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${dish.image}`}
                         alt={dish.name}
                       />
                     ) : (
-                      
-                      <div className="w-full h-full bg-stone-800 flex items-center justify-center text-[10px] text-stone-600">
-                        NO PHOTO
-                      </div>
-                    )}
-                    {dish.orders_count > 0 && (
-                      
-                      <div className="absolute top-2 right-2 bg-stone-800/90 backdrop-blur text-[9px] font-bold px-2 py-0.5 rounded-md border border-stone-700 text-stone-200 shadow-sm">
-                        {dish.orders_count} COMMANDES
+                      <div className="w-full h-full flex items-center justify-center text-[10px] text-stone-400">
+                        —
                       </div>
                     )}
                   </div>
 
-                  <div className="p-5 flex flex-col flex-grow">
-                    <div className="flex justify-between items-start mb-1">
-                      
-                      <h3 className="text-sm font-bold text-white leading-tight">{dish.name}</h3>
-                      
-                      <span className="text-xs font-bold text-stone-300">
-                        {dish.price} <small className="text-[10px] text-stone-500">FCFA</small>
-                      </span>
+                  {/* Infos */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-stone-800 truncate">{dish.name}</h3>
+                      {dish.orders_count > 0 && (
+                        <span className="text-[10px] text-stone-400 whitespace-nowrap">{dish.orders_count} cmd</span>
+                      )}
                     </div>
-                    
-                    <p className="text-xs text-stone-400 leading-normal mb-6 line-clamp-2">{dish.description}</p>
+                    <p className="text-xs text-stone-400 leading-snug line-clamp-1 mt-0.5">{dish.description}</p>
+                  </div>
 
+                  {/* Prix + bouton */}
+                  <div className="flex items-center gap-4 flex-shrink-0">
+                    <span className="text-sm font-semibold text-stone-700 whitespace-nowrap">
+                      {parseInt(dish.price).toLocaleString("fr-FR")} <small className="text-[10px] text-stone-400 font-normal">FCFA</small>
+                    </span>
                     <button
                       onClick={() => !deadlinePassed && setConfirmOrder(dish)}
                       disabled={deadlinePassed}
-                      className={`mt-auto w-full py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all active:scale-[0.97] ${
+                      className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                         deadlinePassed
-                          ? "bg-stone-800 text-stone-600 cursor-not-allowed border border-stone-700"
-                          
-                          : "bg-white text-black border border-white hover:bg-stone-200 hover:scale-[1.02]"
+                          ? "bg-stone-100 text-stone-400 cursor-not-allowed"
+                          : "bg-stone-900 text-white hover:bg-stone-700"
                       }`}
                     >
                       {deadlinePassed ? "Fermé" : "Commander"}
