@@ -101,67 +101,64 @@ export default function Home() {
 
   if (loading)
     return (
-      <div className="flex h-screen items-center justify-center bg-stone-50">
+      <div className="flex h-screen items-center justify-center" style={{ background: "#FAFAF8" }}>
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-4 border-stone-300 border-t-stone-800 rounded-full animate-spin" />
-          <p className="text-xs text-stone-400 uppercase tracking-widest">Chargement…</p>
+          <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: "#E7E5E3", borderTopColor: "#1C1917" }} />
+          <p className="text-[10px] tracking-widest uppercase" style={{ color: "#A8A29E" }}>Chargement…</p>
         </div>
       </div>
     );
 
   if (!todayMenu || todayMenu.dishes.length === 0) {
     return (
-      <div className="flex flex-col h-screen items-center justify-center bg-stone-50 text-center px-6">
-        <div className="w-16 h-16 rounded-2xl bg-stone-100 flex items-center justify-center mb-6">
-          <svg className="w-8 h-8 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-        </div>
-        <h1 className="text-xl font-bold text-stone-800">Aucun menu publié aujourd'hui</h1>
-        <p className="text-stone-500 mt-2 text-sm max-w-xs">Revenez un peu plus tard pour commander votre repas.</p>
-        <button onClick={logout} className="mt-6 text-xs underline text-stone-400 hover:text-stone-600">
+      <div className="flex flex-col h-screen items-center justify-center text-center px-6" style={{ background: "#FAFAF8" }}>
+        <p className="text-sm font-medium mb-1" style={{ color: "#1C1917" }}>Aucun menu publié aujourd&apos;hui</p>
+        <p className="text-xs mb-6" style={{ color: "#A8A29E" }}>Revenez un peu plus tard pour commander votre repas.</p>
+        <button onClick={logout} className="text-xs underline" style={{ color: "#A8A29E" }}>
           Déconnexion
         </button>
       </div>
     );
   }
 
-  // Plat featured en premier
   const featured = todayMenu.dishes.find((d) => d.pivot?.is_featured) ?? todayMenu.dishes[0];
   const others = todayMenu.dishes.filter((d) => d.id !== featured.id);
 
   return (
-    <main className="min-h-screen bg-stone-50 font-sans text-stone-900 antialiased pb-12">
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200/60 px-6 py-3">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 relative rounded-lg overflow-hidden border border-stone-200">
+    <main className="min-h-screen font-sans antialiased pb-16" style={{ background: "#FAFAF8" }}>
+
+      {/* ── Navbar ── */}
+      <nav className="sticky top-0 z-50 border-b px-6 py-3" style={{ background: "rgba(250,250,248,0.92)", backdropFilter: "blur(12px)", borderColor: "#E7E5E3" }}>
+        <div className="max-w-2xl mx-auto flex justify-between items-center">
+
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 relative rounded-md overflow-hidden" style={{ border: "1px solid #E7E5E3" }}>
               <Image src="/logo.jpg" alt="Logo" fill className="object-cover" />
             </div>
-            <span className="text-xs font-bold tracking-widest uppercase text-stone-500">Lunch-Time</span>
+            <span className="text-[11px] font-semibold tracking-widest uppercase" style={{ color: "#A8A29E" }}>Lunch-Time</span>
           </div>
 
-          {/* Deadline banner */}
+          {/* Statut deadline */}
           {deadlinePassed ? (
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-200 rounded-full">
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium" style={{ background: "#FEF2F2", border: "1px solid #FECACA", color: "#DC2626" }}>
               <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
-              <span className="text-xs font-bold text-red-600">Commandes fermées</span>
+              Commandes fermées
             </div>
           ) : (
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full">
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium" style={{ background: "#F0FDF4", border: "1px solid #BBF7D0", color: "#16A34A" }}>
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-xs font-bold text-green-700">
-                Ouvert jusqu'à {todayMenu.order_deadline}
-              </span>
+              Ouvert jusqu&apos;à {todayMenu.order_deadline}
             </div>
           )}
 
           <div className="flex items-center gap-4">
-            <span className="hidden sm:inline text-xs text-stone-400 italic">Bienvenue, {userName}</span>
+            <span className="hidden sm:inline text-xs" style={{ color: "#A8A29E" }}>{userName}</span>
             <button
               onClick={logout}
-              className="text-[11px] font-bold uppercase tracking-wider text-stone-500 hover:text-red-600 transition-colors"
+              className="text-[11px] font-medium tracking-wide transition-colors"
+              style={{ color: "#A8A29E" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#EF4444")}
+              onMouseLeave={e => (e.currentTarget.style.color = "#A8A29E")}
             >
               Déconnexion
             </button>
@@ -169,26 +166,28 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Deadline banner mobile */}
+      {/* Deadline mobile */}
       {deadlinePassed && (
-        <div className="sm:hidden bg-red-600 text-white text-center text-xs font-bold py-2 px-4">
-          ⛔ Les commandes sont fermées pour aujourd'hui
+        <div className="sm:hidden text-center text-xs font-medium py-2 px-4" style={{ background: "#FEF2F2", borderBottom: "1px solid #FECACA", color: "#DC2626" }}>
+          Les commandes sont fermées pour aujourd&apos;hui
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto px-6 pt-8">
-        {/* Date badge */}
-        <div className="mb-6 inline-flex items-center gap-2 bg-amber-100 text-amber-800 px-3 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase">
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          Menu du {new Date(todayMenu.menu_date).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
-        </div>
+      <div className="max-w-2xl mx-auto px-6 pt-8">
 
-        {/* Plat du jour Hero */}
-        <section className="mb-12">
-          <div className="bg-stone-900 rounded-2xl overflow-hidden border border-stone-800 shadow-sm flex flex-col md:flex-row md:h-[320px]">
-            <div className="relative w-full md:w-2/5 h-48 md:h-full overflow-hidden">
+        {/* Date */}
+        <p className="text-[11px] font-medium tracking-widest uppercase mb-6" style={{ color: "#A8A29E" }}>
+          {new Date(todayMenu.menu_date).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
+        </p>
+
+        {/* ── Plat du jour — barre amber signature ── */}
+        <section className="mb-8">
+          <div className="flex rounded-xl overflow-hidden" style={{ background: "#FFFFFF", border: "1px solid #E7E5E3" }}>
+            {/* Accent bar */}
+            <div className="w-1 flex-shrink-0" style={{ background: "#D97706" }} />
+
+            {/* Image */}
+            <div className="relative flex-shrink-0 w-28 h-28 sm:w-36 sm:h-36" style={{ background: "#F5F5F4" }}>
               {featured.image ? (
                 <img
                   src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${featured.image}`}
@@ -196,99 +195,95 @@ export default function Home() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-stone-100 flex items-center justify-center text-xs text-stone-400 uppercase tracking-tighter">
-                  Pas d'image
-                </div>
+                <div className="w-full h-full flex items-center justify-center text-[10px]" style={{ color: "#A8A29E" }}>—</div>
               )}
-              <div className="absolute top-4 left-4 bg-stone-900/90 text-white px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5">
-                <svg className="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
-                Plat du Jour
-              </div>
             </div>
 
-            <div className="p-8 md:w-3/5 flex flex-col justify-center">
-              <div className="flex justify-between items-start mb-2">
-                <h1 className="text-2xl font-semibold text-white tracking-tight">{featured.name}</h1>
-                <span className="text-xl font-medium text-amber-600">
-                  {featured.price} <small className="text-[10px] text-stone-300">FCFA</small>
-                </span>
+            {/* Contenu */}
+            <div className="flex flex-col justify-between flex-1 px-5 py-4">
+              <div>
+                <span className="text-[10px] font-semibold tracking-widest uppercase" style={{ color: "#D97706" }}>Plat du jour</span>
+                <h1 className="text-base font-semibold leading-snug mt-1 mb-1" style={{ color: "#1C1917" }}>{featured.name}</h1>
+                <p className="text-xs leading-relaxed line-clamp-2" style={{ color: "#A8A29E" }}>{featured.description}</p>
               </div>
-              <p className="text-stone-400 text-sm leading-relaxed mb-8 max-w-md">{featured.description}</p>
-
-              <button
-                onClick={() => !deadlinePassed && setConfirmOrder(featured)}
-                disabled={deadlinePassed}
-                className={`w-full md:w-auto px-10 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all active:scale-[0.98] ${
-                  deadlinePassed
-                    ? "bg-stone-200 text-stone-400 cursor-not-allowed"
-                    : "bg-white text-black hover:bg-amber-700"
-                }`}
-              >
-                {deadlinePassed ? "Commandes fermées" : "Commander maintenant"}
-              </button>
+              <div className="flex items-center justify-between mt-3">
+                <span className="text-sm font-semibold" style={{ color: "#1C1917" }}>
+                  {parseInt(featured.price).toLocaleString("fr-FR")}
+                  <span className="text-[10px] font-normal ml-1" style={{ color: "#A8A29E" }}>FCFA</span>
+                </span>
+                <button
+                  onClick={() => !deadlinePassed && setConfirmOrder(featured)}
+                  disabled={deadlinePassed}
+                  className="px-4 py-1.5 rounded-lg text-xs font-medium transition-colors"
+                  style={deadlinePassed
+                    ? { background: "#F5F5F4", color: "#A8A29E", cursor: "not-allowed" }
+                    : { background: "#1C1917", color: "#FFFFFF" }
+                  }
+                  onMouseEnter={e => { if (!deadlinePassed) e.currentTarget.style.background = "#44403C"; }}
+                  onMouseLeave={e => { if (!deadlinePassed) e.currentTarget.style.background = "#1C1917"; }}
+                >
+                  {deadlinePassed ? "Fermé" : "Commander"}
+                </button>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Autres plats */}
+        {/* ── Autres plats ── */}
         {others.length > 0 && (
           <>
-            <div className="flex items-center gap-4 mb-8">
-              <h2 className="text-xs font-black uppercase tracking-[0.3em] text-stone-400">Autres plats</h2>
-              <div className="h-[1px] flex-grow bg-stone-200" />
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-[10px] font-semibold tracking-widest uppercase whitespace-nowrap" style={{ color: "#A8A29E" }}>Au menu</span>
+              <div className="flex-grow h-px" style={{ background: "#E7E5E3" }} />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-2">
               {others.map((dish) => (
                 <div
                   key={dish.id}
-                  
-                  className="group bg-stone-900 rounded-xl border border-stone-800 hover:border-stone-700 hover:shadow-xl hover:shadow-black/50 transition-all duration-300 flex flex-col h-full"
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl"
+                  style={{ background: "#FFFFFF", border: "1px solid #E7E5E3" }}
                 >
-                  <div className="relative h-40 overflow-hidden rounded-t-xl">
+                  {/* Miniature */}
+                  <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0" style={{ background: "#F5F5F4" }}>
                     {dish.image ? (
                       <img
-                        className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                        className="object-cover w-full h-full"
                         src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${dish.image}`}
                         alt={dish.name}
                       />
                     ) : (
-                      
-                      <div className="w-full h-full bg-stone-800 flex items-center justify-center text-[10px] text-stone-600">
-                        NO PHOTO
-                      </div>
-                    )}
-                    {dish.orders_count > 0 && (
-                      
-                      <div className="absolute top-2 right-2 bg-stone-800/90 backdrop-blur text-[9px] font-bold px-2 py-0.5 rounded-md border border-stone-700 text-stone-200 shadow-sm">
-                        {dish.orders_count} COMMANDES
-                      </div>
+                      <div className="w-full h-full flex items-center justify-center text-[10px]" style={{ color: "#A8A29E" }}>—</div>
                     )}
                   </div>
 
-                  <div className="p-5 flex flex-col flex-grow">
-                    <div className="flex justify-between items-start mb-1">
-                      
-                      <h3 className="text-sm font-bold text-white leading-tight">{dish.name}</h3>
-                      
-                      <span className="text-xs font-bold text-stone-300">
-                        {dish.price} <small className="text-[10px] text-stone-500">FCFA</small>
-                      </span>
+                  {/* Infos */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline gap-2">
+                      <h3 className="text-sm font-medium truncate" style={{ color: "#1C1917" }}>{dish.name}</h3>
+                      {dish.orders_count > 0 && (
+                        <span className="text-[10px] flex-shrink-0" style={{ color: "#D4D0CB" }}>{dish.orders_count} cmd</span>
+                      )}
                     </div>
-                    
-                    <p className="text-xs text-stone-400 leading-normal mb-6 line-clamp-2">{dish.description}</p>
+                    <p className="text-xs line-clamp-1 mt-0.5" style={{ color: "#A8A29E" }}>{dish.description}</p>
+                  </div>
 
+                  {/* Prix + bouton */}
+                  <div className="flex items-center gap-4 flex-shrink-0">
+                    <span className="text-sm font-medium hidden sm:block" style={{ color: "#1C1917" }}>
+                      {parseInt(dish.price).toLocaleString("fr-FR")}
+                      <span className="text-[10px] font-normal ml-1" style={{ color: "#A8A29E" }}>FCFA</span>
+                    </span>
                     <button
                       onClick={() => !deadlinePassed && setConfirmOrder(dish)}
                       disabled={deadlinePassed}
-                      className={`mt-auto w-full py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all active:scale-[0.97] ${
-                        deadlinePassed
-                          ? "bg-stone-800 text-stone-600 cursor-not-allowed border border-stone-700"
-                          
-                          : "bg-white text-black border border-white hover:bg-stone-200 hover:scale-[1.02]"
-                      }`}
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+                      style={deadlinePassed
+                        ? { background: "#F5F5F4", color: "#A8A29E", cursor: "not-allowed" }
+                        : { background: "#F5F5F4", color: "#1C1917", border: "1px solid #E7E5E3" }
+                      }
+                      onMouseEnter={e => { if (!deadlinePassed) { e.currentTarget.style.background = "#1C1917"; e.currentTarget.style.color = "#FFFFFF"; }}}
+                      onMouseLeave={e => { if (!deadlinePassed) { e.currentTarget.style.background = "#F5F5F4"; e.currentTarget.style.color = "#1C1917"; }}}
                     >
                       {deadlinePassed ? "Fermé" : "Commander"}
                     </button>
@@ -299,14 +294,19 @@ export default function Home() {
           </>
         )}
       </div>
+
+      {/* Accès Admin */}
       <div className="fixed bottom-4 right-4">
         <Can do="get_admin_panel">
           <button
-              onClick={() => (window.location.href = "/admin")}
-              className="text-[11px] font-bold uppercase tracking-wider text-stone-500 hover:text-blue-600 transition-colors"
-            >
-              Accès Admin
-            </button>
+            onClick={() => (window.location.href = "/admin")}
+            className="text-[11px] font-medium tracking-wide transition-colors"
+            style={{ color: "#A8A29E" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "#1C1917")}
+            onMouseLeave={e => (e.currentTarget.style.color = "#A8A29E")}
+          >
+            Admin
+          </button>
         </Can>
       </div>
 
