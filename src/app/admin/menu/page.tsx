@@ -10,7 +10,7 @@ interface Dish {
   name: string;
   price: string;
   type_plat: string;
-  image: string | null;
+  image_path: string | null;
   pivot?: { is_featured: boolean };
 }
 
@@ -82,9 +82,9 @@ function DishSelector({
                   </div>
                   {/* Image */}
                   <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                    {dish.image ? (
+                    {dish.image_path ? (
                       <img
-                        src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${dish.image}`}
+                        src={dish.image_path}
                         alt={dish.name}
                         className="w-full h-full object-cover"
                       />
@@ -270,8 +270,8 @@ function TodayTab({ allDishes }: { allDishes: Dish[] }) {
             </div>
             <div className="flex items-center gap-4 p-5">
               <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
-                {featured.image ? (
-                  <img src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${featured.image}`} alt={featured.name} className="w-full h-full object-cover" />
+                {featured.image_path ? (
+                  <img src={featured.image_path} alt={featured.name} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">?</div>
                 )}
@@ -295,8 +295,8 @@ function TodayTab({ allDishes }: { allDishes: Dish[] }) {
               {others.map((dish) => (
                 <div key={dish.id} className="flex items-center gap-4 px-5 py-4">
                   <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
-                    {dish.image ? (
-                      <img src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${dish.image}`} alt={dish.name} className="w-full h-full object-cover" />
+                    {dish.image_path ? (
+                      <img src={dish.image_path} alt={dish.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">?</div>
                     )}

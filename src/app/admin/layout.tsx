@@ -6,22 +6,22 @@ import Cookies from "js-cookie";
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 
-const navItems = [
+const NAV = [
   {
     href: "/admin",
     label: "Dashboard",
+    exact: true,
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10-3a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1v-7z" />
       </svg>
     ),
-    exact: true,
   },
   {
     href: "/admin/dishes",
     label: "Catalogue",
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
       </svg>
     ),
@@ -34,7 +34,7 @@ const navItems = [
     href: "/admin/menu",
     label: "Menu du Jour",
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
     ),
@@ -43,7 +43,7 @@ const navItems = [
     href: "/admin/orders",
     label: "Commandes",
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
       </svg>
     ),
@@ -52,7 +52,7 @@ const navItems = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
   const [openSubs, setOpenSubs] = useState<string[]>(["/admin/dishes"]);
 
   const logout = () => {
@@ -62,39 +62,36 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     window.location.href = "/login";
   };
 
-  const toggleSub = (href: string) => {
-    setOpenSubs((prev) =>
-      prev.includes(href) ? prev.filter((h) => h !== href) : [...prev, href]
-    );
-  };
+  const toggleSub = (href: string) =>
+    setOpenSubs((p) => (p.includes(href) ? p.filter((h) => h !== href) : [...p, href]));
 
-  const isActive = (href: string, exact = false) => {
-    if (exact) return pathname === href;
-    return pathname.startsWith(href);
-  };
+  const isActive = (href: string, exact = false) =>
+    exact ? pathname === href : pathname.startsWith(href);
 
   return (
-    <div className="flex min-h-screen bg-[#F4F5F7] font-sans">
-      {/* SIDEBAR */}
-      <aside className="w-64 min-h-screen bg-[#1A1D2E] flex flex-col fixed top-0 left-0 z-40 shadow-2xl">
-        {/* Logo */}
-        <div className="px-6 py-6 border-b border-white/5">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center shadow-lg">
-              <span className="text-white font-black text-xs">UI</span>
-            </div>
+    <div className="flex min-h-screen font-sans" style={{ background: "#F0EEE9" }}>
+
+      {/* ── SIDEBAR ── */}
+      <aside
+        className="w-56 min-h-screen fixed top-0 left-0 z-40 flex flex-col"
+        style={{ background: "#141414" }}
+      >
+        {/* Marque */}
+        <div className="px-5 pt-7 pb-6">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: "#C84B31" }} />
             <div>
-              <p className="text-white font-bold text-sm tracking-tight">Lunch-Time</p>
-              <p className="text-white/40 text-[10px] uppercase tracking-widest">Admin Panel</p>
+              <p className="text-white text-xs font-semibold tracking-widest uppercase leading-none">Lunch-Time</p>
+              <p className="text-[10px] mt-0.5" style={{ color: "#555" }}>administration</p>
             </div>
           </div>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-          {navItems.map((item) => {
+        <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto pb-4">
+          {NAV.map((item) => {
             const active = isActive(item.href, item.exact);
-            const hasChildren = item.children && item.children.length > 0;
+            const hasChildren = !!item.children?.length;
             const subOpen = openSubs.includes(item.href);
 
             return (
@@ -102,52 +99,51 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 {hasChildren ? (
                   <button
                     onClick={() => toggleSub(item.href)}
-                    className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                      active
-                        ? "bg-white/10 text-white"
-                        : "text-white/50 hover:text-white hover:bg-white/5"
-                    }`}
+                    className="w-full flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors"
+                    style={active
+                      ? { color: "#FFFFFF", borderLeft: "2px solid #C84B31", paddingLeft: "10px" }
+                      : { color: "#666", borderLeft: "2px solid transparent", paddingLeft: "10px" }
+                    }
+                    onMouseEnter={e => { if (!active) e.currentTarget.style.color = "#CCC"; }}
+                    onMouseLeave={e => { if (!active) e.currentTarget.style.color = "#666"; }}
                   >
-                    <span className="flex items-center gap-3">
-                      <span className={active ? "text-amber-400" : ""}>{item.icon}</span>
+                    <span className="flex items-center gap-2.5">
+                      {item.icon}
                       {item.label}
                     </span>
-                    <svg
-                      className={`w-4 h-4 transition-transform ${subOpen ? "rotate-180" : ""}`}
-                      fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                    >
+                    <svg className={`w-3 h-3 transition-transform ${subOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
                 ) : (
                   <Link
                     href={item.href}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                      active
-                        ? "bg-white/10 text-white"
-                        : "text-white/50 hover:text-white hover:bg-white/5"
-                    }`}
+                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors"
+                    style={active
+                      ? { color: "#FFFFFF", borderLeft: "2px solid #C84B31", paddingLeft: "10px" }
+                      : { color: "#666", borderLeft: "2px solid transparent", paddingLeft: "10px" }
+                    }
+                    onMouseEnter={e => { if (!active) e.currentTarget.style.color = "#CCC"; }}
+                    onMouseLeave={e => { if (!active) e.currentTarget.style.color = "#666"; }}
                   >
-                    <span className={active ? "text-amber-400" : ""}>{item.icon}</span>
+                    {item.icon}
                     {item.label}
-                    {active && (
-                      <span className="ml-auto w-1.5 h-1.5 bg-amber-400 rounded-full" />
-                    )}
                   </Link>
                 )}
 
-                {/* Sous-menu */}
                 {hasChildren && subOpen && (
-                  <div className="ml-8 mt-0.5 space-y-0.5 border-l border-white/10 pl-3">
+                  <div className="ml-6 mt-0.5 space-y-0.5 pl-3" style={{ borderLeft: "1px solid #222" }}>
                     {item.children!.map((child) => (
                       <Link
                         key={child.href}
                         href={child.href}
-                        className={`block px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                          pathname === child.href
-                            ? "text-amber-400 bg-white/5"
-                            : "text-white/40 hover:text-white hover:bg-white/5"
-                        }`}
+                        className="block px-3 py-2 rounded-md text-[11px] font-medium transition-colors"
+                        style={pathname === child.href
+                          ? { color: "#C84B31" }
+                          : { color: "#555" }
+                        }
+                        onMouseEnter={e => { if (pathname !== child.href) e.currentTarget.style.color = "#CCC"; }}
+                        onMouseLeave={e => { if (pathname !== child.href) e.currentTarget.style.color = "#555"; }}
                       >
                         {child.label}
                       </Link>
@@ -160,22 +156,28 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         {/* Footer */}
-        <div className="px-3 py-4 border-t border-white/5 space-y-1">
+        <div className="px-3 pb-5 space-y-0.5" style={{ borderTop: "1px solid #222" }}>
+          <div className="pt-4" />
           <Link
             href="/"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/40 hover:text-white hover:bg-white/5 transition-all"
+            className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors"
+            style={{ color: "#555", borderLeft: "2px solid transparent", paddingLeft: "10px" }}
+            onMouseEnter={e => { e.currentTarget.style.color = "#CCC"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = "#555"; }}
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
-            Voir le site client
+            Vue client
           </Link>
           <button
-            onClick={() => setShowLogoutDialog(true)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-all"
+            onClick={() => setShowLogout(true)}
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors"
+            style={{ color: "#555", borderLeft: "2px solid transparent", paddingLeft: "10px" }}
+            onMouseEnter={e => { e.currentTarget.style.color = "#C84B31"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = "#555"; }}
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
             Déconnexion
@@ -183,20 +185,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* MAIN CONTENT */}
-      <main className="flex-1 ml-64 min-h-screen">
+      {/* MAIN */}
+      <main className="flex-1 ml-56 min-h-screen">
         {children}
       </main>
 
       <ConfirmDialog
-        open={showLogoutDialog}
+        open={showLogout}
         title="Déconnexion"
         message="Êtes-vous sûr de vouloir vous déconnecter ?"
         confirmLabel="Déconnexion"
         cancelLabel="Rester"
         variant="warning"
         onConfirm={logout}
-        onCancel={() => setShowLogoutDialog(false)}
+        onCancel={() => setShowLogout(false)}
       />
     </div>
   );

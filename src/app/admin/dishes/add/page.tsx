@@ -41,7 +41,7 @@ function DishFormContent() {
           price: dish.price,
           type_plat: dish.type_plat ?? "standard",
         });
-        setExistingImage(dish.image ?? null);
+        setExistingImage(dish.image_path ?? null);
       });
   }, [editId]);
 
@@ -91,7 +91,7 @@ function DishFormContent() {
   const previewUrl = file
     ? URL.createObjectURL(file)
     : existingImage
-    ? `${process.env.NEXT_PUBLIC_API_URL}/storage/${existingImage}`
+    ? existingImage
     : null;
 
   const typeOptions = ["standard", "entrée", "plat principal", "dessert", "boisson"];

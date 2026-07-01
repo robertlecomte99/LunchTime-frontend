@@ -15,7 +15,7 @@ interface Dish {
   name: string;
   description: string;
   price: string;
-  image: string | null;
+  image_path: string | null;
   orders_count: number;
   pivot?: { is_featured: boolean };
 }
@@ -188,9 +188,9 @@ export default function Home() {
 
             {/* Image */}
             <div className="relative flex-shrink-0 w-28 h-28 sm:w-36 sm:h-36" style={{ background: "#F5F5F4" }}>
-              {featured.image ? (
+              {featured.image_path ? (
                 <img
-                  src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${featured.image}`}
+                  src={featured.image_path}
                   alt={featured.name}
                   className="w-full h-full object-cover"
                 />
@@ -246,10 +246,10 @@ export default function Home() {
                 >
                   {/* Miniature */}
                   <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0" style={{ background: "#F5F5F4" }}>
-                    {dish.image ? (
+                    {dish.image_path ? (
                       <img
                         className="object-cover w-full h-full"
-                        src={`${process.env.NEXT_PUBLIC_API_URL}/storage/${dish.image}`}
+                        src={dish.image_path}
                         alt={dish.name}
                       />
                     ) : (
