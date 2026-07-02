@@ -173,16 +173,14 @@ export default function AdminDashboard() {
                     <p className="text-xs truncate mt-0.5" style={{ color: "#CCC" }}>{user.email}</p>
                   </div>
                   <div className="flex flex-col gap-1.5 items-end">
-                    {orders.map((o) => {
-                      const s = STATUS_MAP[o.status] ?? STATUS_MAP.pending;
-                      return (
-                        <div key={o.id} className="flex items-center gap-3">
-                          <span className="text-xs font-medium" style={{ color: "#555" }}>{o.dish?.name}</span>
-                          <span className="font-mono text-[10px] px-2 py-0.5"
-                            style={{ color: s.color, background: `${s.color}18` }}>{s.label}</span>
-                        </div>
-                      );
-                    })}
+                    {orders.map((o) => (
+                      <div key={o.id} className="flex items-center gap-3">
+                        <span className="text-xs font-medium" style={{ color: "#555" }}>{o.dish?.name}</span>
+                        <span className="font-mono text-[10px] px-2 py-0.5" style={{ color: "#AAA", background: "#F0EEE9" }}>
+                          {new Date(o.created_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}

@@ -32,11 +32,11 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
 };
 
 const NEXT_STATUS: Record<string, string | null> = {
-  pending: "preparing", preparing: "ready", ready: "delivering", delivering: "delivered", delivered: null,
+  pending: null, preparing: "ready", ready: "delivering", delivering: "delivered", delivered: null,
 };
 
 const NEXT_LABEL: Record<string, string> = {
-  pending: "Préparer", preparing: "Marquer prête", ready: "Livrer", delivering: "Terminer",
+  preparing: "Marquer prête", ready: "Livrer", delivering: "Terminer",
 };
 
 export default function OrdersAdminPage() {
@@ -184,8 +184,8 @@ export default function OrdersAdminPage() {
 
           {/* En-têtes */}
           <div className="grid gap-px"
-            style={{ gridTemplateColumns: "60px 1.5fr 1fr 100px 120px 80px 150px", background: "#E5E2DC" }}>
-            {["#", "Employé", "Plat", "Date", "Statut", "Heure", "Actions"].map((h) => (
+            style={{ gridTemplateColumns: "60px 1.5fr 1fr 100px 80px 150px", background: "#E5E2DC" }}>
+            {["#", "Employé", "Plat", "Date", "Heure", "Actions"].map((h) => (
               <div key={h} className="px-4 py-3" style={{ background: "#FEFCF8" }}>
                 <span className="text-[10px] font-medium uppercase tracking-widest" style={{ color: "#AAA" }}>{h}</span>
               </div>
@@ -197,7 +197,7 @@ export default function OrdersAdminPage() {
             {loading ? (
               Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="grid gap-4 px-4 py-4"
-                  style={{ gridTemplateColumns: "60px 1.5fr 1fr 100px 120px 80px 150px" }}>
+                  style={{ gridTemplateColumns: "60px 1.5fr 1fr 100px 80px 150px" }}>
                   {Array.from({ length: 7 }).map((_, j) => (
                     <div key={j} className="h-3 rounded animate-pulse" style={{ background: "#F0EEE9" }} />
                   ))}
@@ -218,7 +218,7 @@ export default function OrdersAdminPage() {
                   <div
                     key={order.id}
                     className="grid items-center group transition-colors"
-                    style={{ gridTemplateColumns: "60px 1.5fr 1fr 100px 120px 80px 150px" }}
+                    style={{ gridTemplateColumns: "60px 1.5fr 1fr 100px 80px 150px" }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#FEFCF8"; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                   >
@@ -255,17 +255,6 @@ export default function OrdersAdminPage() {
                         {order.menu?.menu_date
                           ? new Date(order.menu.menu_date).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" })
                           : "—"}
-                      </span>
-                    </div>
-
-                    {/* Statut */}
-                    <div className="px-4 py-3.5">
-                      <span
-                        className="font-mono text-[10px] px-2 py-0.5 inline-flex items-center gap-1.5"
-                        style={{ color: s.color, background: `${s.color}18` }}
-                      >
-                        <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: s.color }} />
-                        {s.label}
                       </span>
                     </div>
 

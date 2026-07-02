@@ -94,7 +94,7 @@ function DishFormContent() {
     ? existingImage
     : null;
 
-  const typeOptions = ["standard", "entrée", "plat principal", "dessert", "boisson"];
+  const typeOptions = ["standard", "daily"];
 
 
 

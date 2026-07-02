@@ -134,7 +134,7 @@ export default function DishesListPage() {
 
           {/* En-têtes */}
           <div className="grid gap-px" style={{
-            gridTemplateColumns: "2fr 1fr 1fr 80px 120px",
+            gridTemplateColumns: "2.5fr 120px 1fr 80px 160px",
             background: "#E5E2DC",
           }}>
             {[
@@ -162,7 +162,7 @@ export default function DishesListPage() {
           <div className="divide-y" style={{ borderColor: "#F7F5F0" }}>
             {loading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="grid gap-px px-5 py-4" style={{ gridTemplateColumns: "2fr 1fr 1fr 80px 120px" }}>
+                <div key={i} className="grid gap-px px-5 py-4" style={{ gridTemplateColumns: "2.5fr 120px 1fr 80px 160px" }}>
                   {Array.from({ length: 5 }).map((_, j) => (
                     <div key={j} className="h-3 rounded animate-pulse" style={{ background: "#F0EEE9" }} />
                   ))}
@@ -177,7 +177,7 @@ export default function DishesListPage() {
                 <div
                   key={dish.id}
                   className="grid items-center gap-px group transition-colors"
-                  style={{ gridTemplateColumns: "2fr 1fr 1fr 80px 120px" }}
+                  style={{ gridTemplateColumns: "2.5fr 120px 1fr 80px 160px" }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#FEFCF8"; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                 >
